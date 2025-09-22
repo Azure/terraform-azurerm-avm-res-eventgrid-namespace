@@ -1,25 +1,93 @@
 variable "location" {
   type        = string
-  description = "Azure region where the resource should be deployed."
+  description = "Azure region where the EventGrid Namespace will be deployed."
   nullable    = false
 }
 
 variable "name" {
   type        = string
-  description = "The name of the this resource."
+  description = "The Name of the Eventgrid Namespace."
 
   validation {
-    condition     = can(regex("TODO", var.name))
-    error_message = "The name must be TODO." # TODO remove the example below once complete:
-    #condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
-    #error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
+    condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
+    error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
   }
 }
 
 # This is required for most resource modules
 variable "resource_group_name" {
   type        = string
-  description = "The resource group where the resources will be deployed."
+  description = "The resource group where the EventGrid Namespace will be deployed."
+}
+
+# Optional basic variables
+variable "capacity" {
+  description = "(Optional) Specifies the Capacity / Throughput Units for an Eventgrid Namespace. Valid values can be between 1 and 40."
+  type        = number
+  default     = 1
+
+  validation {
+    condition     = var.capacity >= 1 && var.capacity <= 40
+    error_message = "Capacity must be between 1 and 40."
+  }
+}
+
+variable "sku" {
+  type = string
+  description = "The SKU of the EventGrid Namespace (Basic or Premium)"
+  default = "Basic"
+}
+
+# Network configuration
+variable "public_network_access" {
+  description = "(Optional) Whether or not public network access is allowed for this server. Defaults to Enabled."
+  type        = string
+  default     = "Enabled"
+
+  validation {
+    condition = contains(["Enabled", "Disabled"], var.public_network_access)
+    error_message = "Public network access must be Enabled or Disabled."
+  }
+}
+
+variable "inbound_ip_rules" {
+  description = "(Optional) One or more inbound_ip_rule blocks as defined below."
+  type = list(object({
+    ip_mask = string           # Required - The IP mask (CIDR) to match on
+    action  = optional(string, "Allow") # Optional - The action to take when the rule is matched
+  }))
+  default = null
+}
+
+variable "minimum_tls_version_allowed" {
+  description = "(Optional) Minimum TLS version allowed for connections. Possible values are 1.1, 1.2."
+  type        = string
+  default     = "1.2"
+
+  validation {
+    condition = var.minimum_tls_version_allowed == null ? true : contains(["1.1", "1.2"], var.minimum_tls_version_allowed)
+    error_message = "Minimum TLS version must be 1.1 or 1.2."
+  }
+}
+
+variable "is_zone_redundant" {
+  description = "(Optional) Specifies if the EventGrid Namespace should be zone redundant."
+  type        = bool
+  default     = false
+}
+
+# Topic spaces configuration - simplified without validations
+variable "topic_spaces_configuration" {
+  type = object({
+    alternative_authentication_name_source = optional(list(string), [])
+    maximum_client_sessions_per_authentication_name = optional(number)
+    maximum_session_expiry_in_hours       = optional(number)
+    route_topic_resource_id               = optional(string)
+    dynamic_routing_enrichment            = optional(list(object({ key = string, value = string })), [])
+    static_routing_enrichment             = optional(list(object({ key = string, value = string })), [])
+  })
+  description = "(Optional) Topic spaces configuration for MQTT and message routing."
+  default = null
 }
 
 # required AVM interfaces

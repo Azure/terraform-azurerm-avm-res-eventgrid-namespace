@@ -1,9 +1,31 @@
-# TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
-resource "azurerm_resource_group" "TODO" {
-  location = var.location
-  name     = var.name # calling code must supply the name
-  tags     = var.tags
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
 }
+
+resource "azapi_resource" "eventgrid_namespace" {
+  type      = "Microsoft.EventGrid/namespaces@2024-06-01-preview"
+  name      = var.name
+  location  = var.location
+  parent_id = data.azurerm_resource_group.rg.id
+
+  # Identity block using managed_identities pattern
+  dynamic "identity" {
+    for_each = local.managed_identities.system_assigned_user_assigned
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.user_assigned_resource_ids
+    }
+  }
+
+  # All properties from locals
+  body = jsonencode({
+    properties = local.eventgrid_properties
+    sku        = local.eventgrid_sku
+  })
+
+  tags = var.tags
+}
+
 
 # required AVM resources interfaces
 resource "azurerm_management_lock" "this" {
@@ -11,15 +33,16 @@ resource "azurerm_management_lock" "this" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.lock.kind}")
-  scope      = azurerm_resource_group.TODO.id # TODO: Replace with your azurerm resource name
+  scope      = azapi_resource.eventgrid_namespace.id
   notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
 }
 
+# required AVM role assignments
 resource "azurerm_role_assignment" "this" {
   for_each = var.role_assignments
 
   principal_id                           = each.value.principal_id
-  scope                                  = azurerm_resource_group.TODO.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
+  scope                                  = azapi_resource.eventgrid_namespace.id
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
