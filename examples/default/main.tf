@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.21"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -21,12 +17,11 @@ provider "azurerm" {
   features {}
 }
 
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.1"
+  version = "0.9.0"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -39,7 +34,17 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
+  version = "0.4.2"
+}
+
+resource "random_string" "eventgrid_suffix" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
+locals {
+  eventgrid_namespace_name = "egns-${random_string.eventgrid_suffix.result}"
 }
 
 # This is required for resource modules
@@ -53,28 +58,28 @@ resource "azurerm_resource_group" "this" {
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "eventgrid_namespace" {
-  source = "../eventgrid-namespace"
+  source = "../../"
 
   # Required parameters
   location            = azurerm_resource_group.this.location
-  name                = module.naming.eventgrid_namespace.name_unique
+  name                = local.eventgrid_namespace_name
   resource_group_name = azurerm_resource_group.this.name
-
+  # Optional configurations
+  capacity            = var.capacity
+  diagnostic_settings = {}
+  # Optional telemetry
+  enable_telemetry  = var.enable_telemetry
+  inbound_ip_rules  = var.inbound_ip_rules
+  is_zone_redundant = var.is_zone_redundant
   # Identity configuration
-  managed_identities = var.managed_identities
-
-  # Topic spaces configuration (optional)
-  topic_spaces_configuration = var.topic_spaces_configuration
-
+  managed_identities          = var.managed_identities
+  minimum_tls_version_allowed = var.minimum_tls_version_allowed
   # Network configuration
   public_network_access = var.public_network_access
-  inbound_ip_rules      = var.inbound_ip_rules
-
-  # Optional configurations
-  capacity                     = var.capacity
-  is_zone_redundant            = var.is_zone_redundant
-  minimum_tls_version_allowed  = var.minimum_tls_version_allowed
-
-  # Optional telemetry
-  enable_telemetry = var.enable_telemetry
+  tags = {
+    environment = "example"
+    project     = "avm-test"
+  }
+  # Topic spaces configuration (optional)
+  topic_spaces_configuration = var.topic_spaces_configuration
 }

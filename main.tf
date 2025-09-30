@@ -3,27 +3,30 @@ data "azurerm_resource_group" "rg" {
 }
 
 resource "azapi_resource" "eventgrid_namespace" {
-  type      = "Microsoft.EventGrid/namespaces@2024-06-01-preview"
-  name      = var.name
   location  = var.location
+  name      = var.name
   parent_id = data.azurerm_resource_group.rg.id
+  type      = "Microsoft.EventGrid/namespaces@2024-06-01-preview"
+  # All properties from locals
+  body = {
+    properties = local.eventgrid_properties
+    sku        = local.eventgrid_sku
+  }
+  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  tags           = var.tags
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   # Identity block using managed_identities pattern
   dynamic "identity" {
     for_each = local.managed_identities.system_assigned_user_assigned
+
     content {
       type         = identity.value.type
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
-
-  # All properties from locals
-  body = jsonencode({
-    properties = local.eventgrid_properties
-    sku        = local.eventgrid_sku
-  })
-
-  tags = var.tags
 }
 
 
@@ -50,4 +53,39 @@ resource "azurerm_role_assignment" "this" {
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
+
+resource "azurerm_monitor_diagnostic_setting" "this" {
+  for_each = var.diagnostic_settings
+
+  name                           = each.value.name != null ? each.value.name : "diag-${var.name}"
+  target_resource_id             = azapi_resource.eventgrid_namespace.id
+  eventhub_authorization_rule_id = each.value.event_hub_authorization_rule_resource_id
+  eventhub_name                  = each.value.event_hub_name
+  log_analytics_destination_type = each.value.log_analytics_destination_type
+  log_analytics_workspace_id     = each.value.workspace_resource_id
+  partner_solution_id            = each.value.marketplace_partner_resource_id
+  storage_account_id             = each.value.storage_account_resource_id
+
+  dynamic "enabled_log" {
+    for_each = each.value.log_categories
+
+    content {
+      category = enabled_log.value
+    }
+  }
+  dynamic "enabled_log" {
+    for_each = each.value.log_groups
+
+    content {
+      category_group = enabled_log.value
+    }
+  }
+  dynamic "metric" {
+    for_each = each.value.metric_categories
+
+    content {
+      category = metric.value
+    }
+  }
 }
