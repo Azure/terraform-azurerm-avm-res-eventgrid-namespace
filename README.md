@@ -23,15 +23,17 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.eventgrid_namespace](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_private_endpoint.this_managed_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group.TODO](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -41,25 +43,33 @@ The following input variables are required:
 
 ### <a name="input_location"></a> [location](#input\_location)
 
-Description: Azure region where the resource should be deployed.
+Description: Azure region where the EventGrid Namespace will be deployed.
 
 Type: `string`
 
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description: The name of the this resource.
+Description: The Name of the Eventgrid Namespace.
 
 Type: `string`
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description: The resource group where the resources will be deployed.
+Description: The resource group where the EventGrid Namespace will be deployed.
 
 Type: `string`
 
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_capacity"></a> [capacity](#input\_capacity)
+
+Description: (Optional) Specifies the Capacity / Throughput Units for an Eventgrid Namespace. Valid values can be between 1 and 40.
+
+Type: `number`
+
+Default: `1`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
@@ -129,6 +139,29 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_inbound_ip_rules"></a> [inbound\_ip\_rules](#input\_inbound\_ip\_rules)
+
+Description: (Optional) One or more inbound\_ip\_rule blocks as defined below.
+
+Type:
+
+```hcl
+list(object({
+    ip_mask = string                    # Required - The IP mask (CIDR) to match on
+    action  = optional(string, "Allow") # Optional - The action to take when the rule is matched
+  }))
+```
+
+Default: `null`
+
+### <a name="input_is_zone_redundant"></a> [is\_zone\_redundant](#input\_is\_zone\_redundant)
+
+Description: (Optional) Specifies if the EventGrid Namespace should be zone redundant.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description: Controls the Resource Lock configuration for this resource. The following properties can be specified:
@@ -165,6 +198,14 @@ object({
 
 Default: `{}`
 
+### <a name="input_minimum_tls_version_allowed"></a> [minimum\_tls\_version\_allowed](#input\_minimum\_tls\_version\_allowed)
+
+Description: (Optional) Minimum TLS version allowed for connections. Possible values are 1.1, 1.2.
+
+Type: `string`
+
+Default: `"1.2"`
+
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
 Description: A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -198,6 +239,7 @@ map(object({
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
       kind = string
@@ -228,6 +270,14 @@ Description: Whether to manage private DNS zone groups with this module. If set 
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
+
+Description: (Optional) Whether or not public network access is allowed for this server. Defaults to Enabled.
+
+Type: `string`
+
+Default: `"Enabled"`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -261,6 +311,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_sku"></a> [sku](#input\_sku)
+
+Description: The SKU of the EventGrid Namespace (Basic or Premium)
+
+Type: `string`
+
+Default: `"Basic"`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: (Optional) Tags of the resource.
@@ -269,13 +327,52 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
+
+Description: (Optional) Topic spaces configuration for MQTT and message routing.
+
+Type:
+
+```hcl
+object({
+    alternative_authentication_name_source          = optional(list(string), [])
+    maximum_client_sessions_per_authentication_name = optional(number)
+    maximum_session_expiry_in_hours                 = optional(number)
+    route_topic_resource_id                         = optional(string)
+    dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
+    static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
+  })
+```
+
+Default: `null`
+
 ## Outputs
 
 The following outputs are exported:
 
+### <a name="output_identity"></a> [identity](#output\_identity)
+
+Description: The identiy of the EventGrid Namespace.
+
+### <a name="output_location"></a> [location](#output\_location)
+
+Description: The location of the EventGrid Namespace.
+
+### <a name="output_name"></a> [name](#output\_name)
+
+Description: The name of the EventGrid Namespace.
+
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
-Description:   A map of the private endpoints created.
+Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the Event Grid Namespace.
+
+### <a name="output_tags"></a> [tags](#output\_tags)
+
+Description: The tags of the EventGrid Namespace.
 
 ## Modules
 
