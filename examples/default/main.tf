@@ -44,7 +44,7 @@ resource "random_string" "eventgrid_suffix" {
 }
 
 locals {
-  eventgrid_namespace_name = "egns-${random_string.eventgrid_suffix.result}"
+  eventgrid_namespace_name = "egns${random_string.eventgrid_suffix.result}"
 }
 
 # This is required for resource modules

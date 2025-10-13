@@ -6,7 +6,7 @@ variable "location" {
 
 variable "name" {
   type        = string
-  description = "The Name of the Eventgrid Namespace."
+  description = "The name of the EventGrid Namespace."
 
   validation {
     condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
@@ -241,7 +241,7 @@ variable "private_endpoints_manage_dns_zone_group" {
 variable "public_network_access" {
   type        = string
   default     = "Enabled"
-  description = "(Optional) Whether or not public network access is allowed for this server. Defaults to Enabled."
+  description = "(Optional) Whether or not public network access is allowed for this namespace. Defaults to Enabled."
 
   validation {
     condition     = contains(["Enabled", "Disabled"], var.public_network_access)
@@ -282,6 +282,11 @@ variable "sku" {
   type        = string
   default     = "Basic"
   description = "The SKU of the EventGrid Namespace (Basic or Premium)"
+
+  validation {
+    condition     = contains(["Basic", "Premium"], var.sku)
+    error_message = "The SKU must be either 'Basic' or 'Premium'."
+  }
 }
 
 # tflint-ignore: terraform_unused_declarations

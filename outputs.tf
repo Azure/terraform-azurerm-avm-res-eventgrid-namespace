@@ -1,5 +1,5 @@
 output "identity" {
-  description = "The identiy of the EventGrid Namespace."
+  description = "The identity of the EventGrid Namespace."
   value       = azapi_resource.eventgrid_namespace.identity
 }
 

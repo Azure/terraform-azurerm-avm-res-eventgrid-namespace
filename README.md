@@ -49,7 +49,7 @@ Type: `string`
 
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description: The Name of the Eventgrid Namespace.
+Description: The name of the EventGrid Namespace.
 
 Type: `string`
 
@@ -273,7 +273,7 @@ Default: `true`
 
 ### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
 
-Description: (Optional) Whether or not public network access is allowed for this server. Defaults to Enabled.
+Description: (Optional) Whether or not public network access is allowed for this namespace. Defaults to Enabled.
 
 Type: `string`
 
@@ -352,7 +352,7 @@ The following outputs are exported:
 
 ### <a name="output_identity"></a> [identity](#output\_identity)
 
-Description: The identiy of the EventGrid Namespace.
+Description: The identity of the EventGrid Namespace.
 
 ### <a name="output_location"></a> [location](#output\_location)
 

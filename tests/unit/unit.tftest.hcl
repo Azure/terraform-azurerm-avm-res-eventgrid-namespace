@@ -3,7 +3,7 @@ mock_provider "azurerm" {}
 variables {
   enable_telemetry    = false
   resource_group_name = "test"
-  name                = "test"
+  name                = "validName"
   location            = "eastus"
 }
 
