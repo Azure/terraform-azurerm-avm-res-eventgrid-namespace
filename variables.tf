@@ -1,25 +1,35 @@
 variable "location" {
   type        = string
-  description = "Azure region where the resource should be deployed."
+  description = "Azure region where the EventGrid Namespace will be deployed."
   nullable    = false
 }
 
 variable "name" {
   type        = string
-  description = "The name of the this resource."
+  description = "The name of the EventGrid Namespace."
 
   validation {
-    condition     = can(regex("TODO", var.name))
-    error_message = "The name must be TODO." # TODO remove the example below once complete:
-    #condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
-    #error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
+    condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
+    error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
   }
 }
 
 # This is required for most resource modules
 variable "resource_group_name" {
   type        = string
-  description = "The resource group where the resources will be deployed."
+  description = "The resource group where the EventGrid Namespace will be deployed."
+}
+
+# Optional basic variables
+variable "capacity" {
+  type        = number
+  default     = 1
+  description = "(Optional) Specifies the Capacity / Throughput Units for an Eventgrid Namespace. Valid values can be between 1 and 40."
+
+  validation {
+    condition     = var.capacity >= 1 && var.capacity <= 40
+    error_message = "Capacity must be between 1 and 40."
+  }
 }
 
 # required AVM interfaces
@@ -101,6 +111,21 @@ DESCRIPTION
   nullable    = false
 }
 
+variable "inbound_ip_rules" {
+  type = list(object({
+    ip_mask = string                    # Required - The IP mask (CIDR) to match on
+    action  = optional(string, "Allow") # Optional - The action to take when the rule is matched
+  }))
+  default     = null
+  description = "(Optional) One or more inbound_ip_rule blocks as defined below."
+}
+
+variable "is_zone_redundant" {
+  type        = bool
+  default     = false
+  description = "(Optional) Specifies if the EventGrid Namespace should be zone redundant."
+}
+
 variable "lock" {
   type = object({
     kind = string
@@ -136,6 +161,17 @@ DESCRIPTION
   nullable    = false
 }
 
+variable "minimum_tls_version_allowed" {
+  type        = string
+  default     = "1.2"
+  description = "(Optional) Minimum TLS version allowed for connections. Possible values are 1.1, 1.2."
+
+  validation {
+    condition     = var.minimum_tls_version_allowed == null ? true : contains(["1.1", "1.2"], var.minimum_tls_version_allowed)
+    error_message = "Minimum TLS version must be 1.1 or 1.2."
+  }
+}
+
 variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
@@ -147,6 +183,7 @@ variable "private_endpoints" {
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
       kind = string
@@ -200,6 +237,18 @@ variable "private_endpoints_manage_dns_zone_group" {
   nullable    = false
 }
 
+# Network configuration
+variable "public_network_access" {
+  type        = string
+  default     = "Enabled"
+  description = "(Optional) Whether or not public network access is allowed for this namespace. Defaults to Enabled."
+
+  validation {
+    condition     = contains(["Enabled", "Disabled"], var.public_network_access)
+    error_message = "Public network access must be Enabled or Disabled."
+  }
+}
+
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
@@ -229,9 +278,34 @@ DESCRIPTION
   nullable    = false
 }
 
+variable "sku" {
+  type        = string
+  default     = "Basic"
+  description = "The SKU of the EventGrid Namespace (Basic or Premium)"
+
+  validation {
+    condition     = contains(["Basic", "Premium"], var.sku)
+    error_message = "The SKU must be either 'Basic' or 'Premium'."
+  }
+}
+
 # tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
+}
+
+# Topic spaces configuration - simplified without validations
+variable "topic_spaces_configuration" {
+  type = object({
+    alternative_authentication_name_source          = optional(list(string), [])
+    maximum_client_sessions_per_authentication_name = optional(number)
+    maximum_session_expiry_in_hours                 = optional(number)
+    route_topic_resource_id                         = optional(string)
+    dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
+    static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
+  })
+  default     = null
+  description = "(Optional) Topic spaces configuration for MQTT and message routing."
 }

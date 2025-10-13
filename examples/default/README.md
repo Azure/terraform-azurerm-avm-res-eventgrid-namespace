@@ -13,10 +13,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.21"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -28,12 +24,11 @@ provider "azurerm" {
   features {}
 }
 
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.1"
+  version = "0.9.0"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -46,7 +41,17 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
+  version = "0.4.2"
+}
+
+resource "random_string" "eventgrid_suffix" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
+locals {
+  eventgrid_namespace_name = "egns${random_string.eventgrid_suffix.result}"
 }
 
 # This is required for resource modules
@@ -59,15 +64,31 @@ resource "azurerm_resource_group" "this" {
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
-module "test" {
+module "eventgrid_namespace" {
   source = "../../"
 
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
+  # Required parameters
   location            = azurerm_resource_group.this.location
-  name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
+  name                = local.eventgrid_namespace_name
   resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry    = var.enable_telemetry # see variables.tf
+  # Optional configurations
+  capacity            = var.capacity
+  diagnostic_settings = {}
+  # Optional telemetry
+  enable_telemetry  = var.enable_telemetry
+  inbound_ip_rules  = var.inbound_ip_rules
+  is_zone_redundant = var.is_zone_redundant
+  # Identity configuration
+  managed_identities          = var.managed_identities
+  minimum_tls_version_allowed = var.minimum_tls_version_allowed
+  # Network configuration
+  public_network_access = var.public_network_access
+  tags = {
+    environment = "example"
+    project     = "avm-test"
+  }
+  # Topic spaces configuration (optional)
+  topic_spaces_configuration = var.topic_spaces_configuration
 }
 ```
 
@@ -80,8 +101,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.21)
 
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
-
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
 ## Resources
@@ -90,6 +109,7 @@ The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [random_string.eventgrid_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -99,6 +119,14 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_capacity"></a> [capacity](#input\_capacity)
+
+Description: Capacity / throughput units for the EventGrid Namespace.
+
+Type: `number`
+
+Default: `1`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
@@ -110,6 +138,79 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_inbound_ip_rules"></a> [inbound\_ip\_rules](#input\_inbound\_ip\_rules)
+
+Description: Optional inbound IP rules.
+
+Type: `list(object({ ip_mask = string, action = optional(string, "Allow") }))`
+
+Default: `[]`
+
+### <a name="input_is_zone_redundant"></a> [is\_zone\_redundant](#input\_is\_zone\_redundant)
+
+Description: Enable zone redundancy.
+
+Type: `bool`
+
+Default: `false`
+
+### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
+
+Description: Managed identity configuration for the EventGrid Namespace.
+
+Type:
+
+```hcl
+object({
+    system_assigned            = bool
+    user_assigned_resource_ids = optional(list(string), [])
+  })
+```
+
+Default:
+
+```json
+{
+  "system_assigned": true,
+  "user_assigned_resource_ids": []
+}
+```
+
+### <a name="input_minimum_tls_version_allowed"></a> [minimum\_tls\_version\_allowed](#input\_minimum\_tls\_version\_allowed)
+
+Description: Minimum TLS version allowed for connections.
+
+Type: `string`
+
+Default: `"1.2"`
+
+### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
+
+Description: Allow public network access.
+
+Type: `string`
+
+Default: `"Enabled"`
+
+### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
+
+Description: (Optional) Topic spaces configuration for EventGrid MQTT/topics.
+
+Type:
+
+```hcl
+object({
+    alternative_authentication_name_source          = optional(list(string), [])
+    maximum_client_sessions_per_authentication_name = optional(number)
+    maximum_session_expiry_in_hours                 = optional(number)
+    route_topic_resource_id                         = optional(string)
+    dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
+    static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
+  })
+```
+
+Default: `null`
+
 ## Outputs
 
 No outputs.
@@ -118,23 +219,23 @@ No outputs.
 
 The following Modules are called:
 
+### <a name="module_eventgrid_namespace"></a> [eventgrid\_namespace](#module\_eventgrid\_namespace)
+
+Source: ../../
+
+Version:
+
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
 Source: Azure/naming/azurerm
 
-Version: ~> 0.3
+Version: 0.4.2
 
 ### <a name="module_regions"></a> [regions](#module\_regions)
 
 Source: Azure/avm-utl-regions/azurerm
 
-Version: ~> 0.1
-
-### <a name="module_test"></a> [test](#module\_test)
-
-Source: ../../
-
-Version:
+Version: 0.9.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
