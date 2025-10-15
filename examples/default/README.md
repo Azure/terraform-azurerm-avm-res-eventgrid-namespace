@@ -79,16 +79,13 @@ module "eventgrid_namespace" {
   inbound_ip_rules  = var.inbound_ip_rules
   is_zone_redundant = var.is_zone_redundant
   # Identity configuration
-  managed_identities          = var.managed_identities
-  minimum_tls_version_allowed = var.minimum_tls_version_allowed
+  managed_identities = var.managed_identities
   # Network configuration
   public_network_access = var.public_network_access
   tags = {
     environment = "example"
     project     = "avm-test"
   }
-  # Topic spaces configuration (optional)
-  topic_spaces_configuration = var.topic_spaces_configuration
 }
 ```
 
@@ -176,14 +173,6 @@ Default:
 }
 ```
 
-### <a name="input_minimum_tls_version_allowed"></a> [minimum\_tls\_version\_allowed](#input\_minimum\_tls\_version\_allowed)
-
-Description: Minimum TLS version allowed for connections.
-
-Type: `string`
-
-Default: `"1.2"`
-
 ### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
 
 Description: Allow public network access.
@@ -191,25 +180,6 @@ Description: Allow public network access.
 Type: `string`
 
 Default: `"Enabled"`
-
-### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
-
-Description: (Optional) Topic spaces configuration for EventGrid MQTT/topics.
-
-Type:
-
-```hcl
-object({
-    alternative_authentication_name_source          = optional(list(string), [])
-    maximum_client_sessions_per_authentication_name = optional(number)
-    maximum_session_expiry_in_hours                 = optional(number)
-    route_topic_resource_id                         = optional(string)
-    dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
-    static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
-  })
-```
-
-Default: `null`
 
 ## Outputs
 

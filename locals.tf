@@ -2,10 +2,9 @@ locals {
   # All EventGrid Namespace properties organized by category
   eventgrid_properties = {
     # Network & Security properties
-    inboundIpRules           = var.inbound_ip_rules
-    publicNetworkAccess      = var.public_network_access
-    minimumTlsVersionAllowed = var.minimum_tls_version_allowed
-    isZoneRedundant          = var.is_zone_redundant
+    inboundIpRules      = var.inbound_ip_rules
+    publicNetworkAccess = var.public_network_access
+    isZoneRedundant     = var.is_zone_redundant
 
     # Topic spaces configuration
     topicSpacesConfiguration = var.topic_spaces_configuration != null ? {

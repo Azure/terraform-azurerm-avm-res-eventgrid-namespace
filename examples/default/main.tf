@@ -72,14 +72,11 @@ module "eventgrid_namespace" {
   inbound_ip_rules  = var.inbound_ip_rules
   is_zone_redundant = var.is_zone_redundant
   # Identity configuration
-  managed_identities          = var.managed_identities
-  minimum_tls_version_allowed = var.minimum_tls_version_allowed
+  managed_identities = var.managed_identities
   # Network configuration
   public_network_access = var.public_network_access
   tags = {
     environment = "example"
     project     = "avm-test"
   }
-  # Topic spaces configuration (optional)
-  topic_spaces_configuration = var.topic_spaces_configuration
 }

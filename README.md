@@ -63,6 +63,22 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### <a name="input_ca_certificates"></a> [ca\_certificates](#input\_ca\_certificates)
+
+Description: (Optional) A map of CA certificates to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Type:
+
+```hcl
+map(object({
+    name                = string
+    description         = optional(string, null)
+    encoded_certificate = string
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_capacity"></a> [capacity](#input\_capacity)
 
 Description: (Optional) Specifies the Capacity / Throughput Units for an Eventgrid Namespace. Valid values can be between 1 and 40.
@@ -70,6 +86,44 @@ Description: (Optional) Specifies the Capacity / Throughput Units for an Eventgr
 Type: `number`
 
 Default: `1`
+
+### <a name="input_client_groups"></a> [client\_groups](#input\_client\_groups)
+
+Description: (Optional) A map of client groups to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Type:
+
+```hcl
+map(object({
+    name        = string
+    description = optional(string, null)
+    query       = string
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_clients"></a> [clients](#input\_clients)
+
+Description: (Optional) A map of clients to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Type:
+
+```hcl
+map(object({
+    name                = string
+    authentication_name = string
+    description         = optional(string, null)
+    state               = optional(string, "Enabled")
+    client_certificate_authentication = optional(object({
+      validation_scheme   = string
+      allowed_thumbprints = optional(list(string))
+    }), null)
+    attributes = optional(map(string), {})
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
@@ -198,13 +252,38 @@ object({
 
 Default: `{}`
 
-### <a name="input_minimum_tls_version_allowed"></a> [minimum\_tls\_version\_allowed](#input\_minimum\_tls\_version\_allowed)
+### <a name="input_namespace_topics"></a> [namespace\_topics](#input\_namespace\_topics)
 
-Description: (Optional) Minimum TLS version allowed for connections. Possible values are 1.1, 1.2.
+Description: (Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-Type: `string`
+Type:
 
-Default: `"1.2"`
+```hcl
+map(object({
+    name                 = string
+    event_retention_days = optional(number, 1)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_permission_bindings"></a> [permission\_bindings](#input\_permission\_bindings)
+
+Description: (Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Type:
+
+```hcl
+map(object({
+    name              = string
+    description       = optional(string, null)
+    client_group_name = string
+    topic_space_name  = string
+    permission        = string
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
@@ -313,11 +392,11 @@ Default: `{}`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
-Description: The SKU of the EventGrid Namespace (Basic or Premium)
+Description: The SKU of the EventGrid Namespace (Standard or Premium)
 
 Type: `string`
 
-Default: `"Basic"`
+Default: `"Standard"`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
@@ -326,6 +405,72 @@ Description: (Optional) Tags of the resource.
 Type: `map(string)`
 
 Default: `null`
+
+### <a name="input_topic_event_subscriptions"></a> [topic\_event\_subscriptions](#input\_topic\_event\_subscriptions)
+
+Description: Map of event subscriptions for namespace topics.
+
+Type:
+
+```hcl
+map(object({
+    topic_key                        = string
+    name                             = string
+    delivery_mode                    = string
+    event_delivery_schema            = optional(string, "CloudEventSchemaV1_0")
+    expiration_time_utc              = optional(string)
+    event_time_to_live               = optional(string, "P1D")
+    max_delivery_count               = optional(number, 30)
+    receive_lock_duration_in_seconds = optional(number, 60)
+
+    destination = optional(object({
+      endpointType = string
+      properties   = map(any)
+    }))
+
+    delivery_identity = optional(object({
+      type                      = string
+      user_assigned_identity_id = optional(string)
+    }))
+
+    dead_letter_destination = optional(object({
+      storage_account_id        = string
+      blob_container_name       = string
+      identity_type             = optional(string, "SystemAssigned")
+      user_assigned_identity_id = optional(string)
+    }))
+
+    filters_configuration = optional(object({
+      included_event_types = optional(list(string))
+      filters = optional(list(object({
+        key           = string
+        operator_type = string
+        value         = optional(any)
+        values        = optional(list(any))
+      })))
+    }))
+
+    tags = optional(map(string), {})
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_topic_spaces"></a> [topic\_spaces](#input\_topic\_spaces)
+
+Description: (Optional) A map of topic spaces to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Type:
+
+```hcl
+map(object({
+    name            = string
+    description     = optional(string, null)
+    topic_templates = list(string)
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
 
@@ -376,7 +521,49 @@ Description: The tags of the EventGrid Namespace.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_ca_certificates"></a> [ca\_certificates](#module\_ca\_certificates)
+
+Source: ./modules/ca_certificate
+
+Version:
+
+### <a name="module_client_groups"></a> [client\_groups](#module\_client\_groups)
+
+Source: ./modules/client_group
+
+Version:
+
+### <a name="module_clients"></a> [clients](#module\_clients)
+
+Source: ./modules/client
+
+Version:
+
+### <a name="module_namespace_topics"></a> [namespace\_topics](#module\_namespace\_topics)
+
+Source: ./modules/namespace_topic
+
+Version:
+
+### <a name="module_permission_bindings"></a> [permission\_bindings](#module\_permission\_bindings)
+
+Source: ./modules/permission_binding
+
+Version:
+
+### <a name="module_topic_event_subscriptions"></a> [topic\_event\_subscriptions](#module\_topic\_event\_subscriptions)
+
+Source: ./modules/topic_event_subscription
+
+Version:
+
+### <a name="module_topic_spaces"></a> [topic\_spaces](#module\_topic\_spaces)
+
+Source: ./modules/topic_space
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

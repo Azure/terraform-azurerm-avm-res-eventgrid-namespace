@@ -20,6 +20,16 @@ variable "resource_group_name" {
   description = "The resource group where the EventGrid Namespace will be deployed."
 }
 
+variable "ca_certificates" {
+  type = map(object({
+    name                = string
+    description         = optional(string, null)
+    encoded_certificate = string
+  }))
+  default     = {}
+  description = "(Optional) A map of CA certificates to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
+}
+
 # Optional basic variables
 variable "capacity" {
   type        = number
@@ -30,6 +40,32 @@ variable "capacity" {
     condition     = var.capacity >= 1 && var.capacity <= 40
     error_message = "Capacity must be between 1 and 40."
   }
+}
+
+variable "client_groups" {
+  type = map(object({
+    name        = string
+    description = optional(string, null)
+    query       = string
+  }))
+  default     = {}
+  description = "(Optional) A map of client groups to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
+}
+
+variable "clients" {
+  type = map(object({
+    name                = string
+    authentication_name = string
+    description         = optional(string, null)
+    state               = optional(string, "Enabled")
+    client_certificate_authentication = optional(object({
+      validation_scheme   = string
+      allowed_thumbprints = optional(list(string))
+    }), null)
+    attributes = optional(map(string), {})
+  }))
+  default     = {}
+  description = "(Optional) A map of clients to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
 }
 
 # required AVM interfaces
@@ -161,15 +197,25 @@ DESCRIPTION
   nullable    = false
 }
 
-variable "minimum_tls_version_allowed" {
-  type        = string
-  default     = "1.2"
-  description = "(Optional) Minimum TLS version allowed for connections. Possible values are 1.1, 1.2."
+variable "namespace_topics" {
+  type = map(object({
+    name                 = string
+    event_retention_days = optional(number, 1)
+  }))
+  default     = {}
+  description = "(Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
+}
 
-  validation {
-    condition     = var.minimum_tls_version_allowed == null ? true : contains(["1.1", "1.2"], var.minimum_tls_version_allowed)
-    error_message = "Minimum TLS version must be 1.1 or 1.2."
-  }
+variable "permission_bindings" {
+  type = map(object({
+    name              = string
+    description       = optional(string, null)
+    client_group_name = string
+    topic_space_name  = string
+    permission        = string
+  }))
+  default     = {}
+  description = "(Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
 }
 
 variable "private_endpoints" {
@@ -280,12 +326,12 @@ DESCRIPTION
 
 variable "sku" {
   type        = string
-  default     = "Basic"
-  description = "The SKU of the EventGrid Namespace (Basic or Premium)"
+  default     = "Standard"
+  description = "The SKU of the EventGrid Namespace (Standard or Premium)"
 
   validation {
-    condition     = contains(["Basic", "Premium"], var.sku)
-    error_message = "The SKU must be either 'Basic' or 'Premium'."
+    condition     = contains(["Standard", "Premium"], var.sku)
+    error_message = "The SKU must be either 'Standard' or 'Premium'."
   }
 }
 
@@ -294,6 +340,61 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
+}
+
+variable "topic_event_subscriptions" {
+  type = map(object({
+    topic_key                        = string
+    name                             = string
+    delivery_mode                    = string
+    event_delivery_schema            = optional(string, "CloudEventSchemaV1_0")
+    expiration_time_utc              = optional(string)
+    event_time_to_live               = optional(string, "P1D")
+    max_delivery_count               = optional(number, 30)
+    receive_lock_duration_in_seconds = optional(number, 60)
+
+    destination = optional(object({
+      endpointType = string
+      properties   = map(any)
+    }))
+
+    delivery_identity = optional(object({
+      type                      = string
+      user_assigned_identity_id = optional(string)
+    }))
+
+    dead_letter_destination = optional(object({
+      storage_account_id        = string
+      blob_container_name       = string
+      identity_type             = optional(string, "SystemAssigned")
+      user_assigned_identity_id = optional(string)
+    }))
+
+    filters_configuration = optional(object({
+      included_event_types = optional(list(string))
+      filters = optional(list(object({
+        key           = string
+        operator_type = string
+        value         = optional(any)
+        values        = optional(list(any))
+      })))
+    }))
+
+    tags = optional(map(string), {})
+  }))
+  default     = {}
+  description = "Map of event subscriptions for namespace topics."
+  nullable    = false
+}
+
+variable "topic_spaces" {
+  type = map(object({
+    name            = string
+    description     = optional(string, null)
+    topic_templates = list(string)
+  }))
+  default     = {}
+  description = "(Optional) A map of topic spaces to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
 }
 
 # Topic spaces configuration - simplified without validations
