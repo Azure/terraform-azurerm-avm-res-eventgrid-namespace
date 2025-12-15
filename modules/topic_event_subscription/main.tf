@@ -75,5 +75,6 @@ resource "azapi_resource" "event_subscription" {
       tags = var.tags
     }
   }
+  response_export_values    = []
   schema_validation_enabled = false
 }

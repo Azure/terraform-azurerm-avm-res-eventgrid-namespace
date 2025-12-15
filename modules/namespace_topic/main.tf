@@ -15,5 +15,6 @@ resource "azapi_resource" "namespace_topics" {
       description     = var.description
     }
   }
+  response_export_values    = []
   schema_validation_enabled = false
 }

@@ -8,13 +8,8 @@ resource "azapi_resource" "eventgrid_namespace" {
   parent_id = data.azurerm_resource_group.rg.id
   type      = "Microsoft.EventGrid/namespaces@2024-06-01-preview"
   body = {
-    properties = merge(
-      local.eventgrid_properties,
-      {
-        isZoneRedundant = true
-      }
-    )
-    sku = local.eventgrid_sku
+    properties = local.eventgrid_properties
+    sku        = local.eventgrid_sku
   }
   create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null

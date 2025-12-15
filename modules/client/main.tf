@@ -14,4 +14,5 @@ resource "azapi_resource" "client" {
       attributes = var.attributes
     }
   }
+  response_export_values = []
 }

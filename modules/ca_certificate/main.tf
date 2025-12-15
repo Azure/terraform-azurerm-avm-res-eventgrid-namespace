@@ -8,4 +8,5 @@ resource "azapi_resource" "ca_certificate" {
       encodedCertificate = var.encoded_certificate
     }
   }
+  response_export_values = []
 }

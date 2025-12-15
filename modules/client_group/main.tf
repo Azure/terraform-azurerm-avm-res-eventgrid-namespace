@@ -8,4 +8,5 @@ resource "azapi_resource" "client_group" {
       query       = var.query
     }
   }
+  response_export_values = []
 }

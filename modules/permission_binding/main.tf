@@ -10,4 +10,5 @@ resource "azapi_resource" "permission_binding" {
       permission      = var.permission
     }
   }
+  response_export_values = []
 }

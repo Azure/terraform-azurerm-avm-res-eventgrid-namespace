@@ -65,7 +65,11 @@ The following input variables are optional (have default values):
 
 ### <a name="input_ca_certificates"></a> [ca\_certificates](#input\_ca\_certificates)
 
-Description: (Optional) A map of CA certificates to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   (Optional) A map of CA certificates to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the CA certificate resource.
+- `description` - (Optional) A description for the CA certificate.
+- `encoded_certificate` - (Required) The base64-encoded CA certificate data.
 
 Type:
 
@@ -89,7 +93,11 @@ Default: `1`
 
 ### <a name="input_client_groups"></a> [client\_groups](#input\_client\_groups)
 
-Description: (Optional) A map of client groups to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: (Optional) A map of client groups to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the client group.
+- `description` - (Optional) A description for the client group.
+- `query` - (Required) The query used to select clients for this client group.
 
 Type:
 
@@ -105,7 +113,14 @@ Default: `{}`
 
 ### <a name="input_clients"></a> [clients](#input\_clients)
 
-Description: (Optional) A map of clients to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: (Optional) A map of clients to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the client.
+- `authentication_name` - (Required) The name of the authentication method to use for the client.
+- `description` - (Optional) A description for the client.
+- `state` - (Optional) The state of the client. Defaults to "Enabled".
+- `client_certificate_authentication` - (Optional) Client certificate authentication settings.
+- `attributes` - (Optional) A map of additional attributes for the client.
 
 Type:
 
@@ -408,7 +423,35 @@ Default: `null`
 
 ### <a name="input_topic_event_subscriptions"></a> [topic\_event\_subscriptions](#input\_topic\_event\_subscriptions)
 
-Description: Map of event subscriptions for namespace topics.
+Description: Map of event subscriptions for namespace topics.  
+Each object in the map supports the following attributes:
+- `topic_key` - (Required) The key of the topic to subscribe to.
+- `name` - (Required) The name of the event subscription.
+- `delivery_mode` - (Required) The delivery mode for the event subscription. Possible values are `WebHook` and `Queue`.
+- `event_delivery_schema` - (Optional) The event delivery schema. Possible values are `CloudEventSchemaV1_0`, `EventGridSchema` and `CustomEventSchema`. Default is `CloudEventSchemaV1_0`.
+- `expiration_time_utc` - (Optional) The expiration time of the event subscription in UTC.
+- `event_time_to_live` - (Optional) The time to live for events in the event subscription. Default is `P1D`.
+- `max_delivery_count` - (Optional) The maximum delivery count for events in the event subscription. Default is `30`.
+- `receive_lock_duration_in_seconds` - (Optional) The receive lock duration in seconds for events in the event subscription. Default  is `60`.
+- `destination` - (Optional) The destination for the event subscription. This is required if `delivery_identity` is not specified.
+  - `endpointType` - (Required) The type of the endpoint. Possible values are `WebHook`, `EventHub`, `StorageQueue`, `ServiceBusQueue`, `ServiceBusTopic` and `HybridConnection`.
+  - `properties` - (Required) A map of properties for the endpoint.
+- `delivery_identity` - (Optional) The delivery identity for the event subscription. This is required if `destination` is not specified.
+  - `type` - (Required) The type of the identity. Possible values are `SystemAssigned`, `UserAssigned` and `SystemAssigned, UserAssigned`.
+  - `user_assigned_identity_id` - (Optional) The resource ID of the user assigned identity. This is required if `type` is `UserAssigned` or `SystemAssigned, UserAssigned`.
+- `dead_letter_destination` - (Optional) The dead letter destination for the event subscription.
+  - `storage_account_id` - (Required) The resource ID of the storage account to use for dead lettering.
+  - `blob_container_name` - (Required) The name of the blob container to use for dead lettering.
+  - `identity_type` - (Optional) The type of the identity to use for dead lettering. Possible values are `SystemAssigned` and `UserAssigned`. Default is `SystemAssigned`.
+  - `user_assigned_identity_id` - (Optional) The resource ID of the user assigned identity to use for dead lettering. This is required if `identity_type` is `UserAssigned`.
+- `filters_configuration` - (Optional) The filters configuration for the event subscription.
+  - `included_event_types` - (Optional) A list of event types to include in the event subscription.
+  - `filters` - (Optional) A list of filters to apply to the event subscription.
+    - `key` - (Required) The key of the filter.
+    - `operator_type` - (Required) The operator type of the filter. Possible values are `StringEquals`, `StringContains`, `StringBeginsWith`, `StringEndsWith`, `NumberEquals`, `NumberGreaterThan`, `NumberLessThan`, `BoolEquals` and `Advanced`.
+    - `value` - (Optional) The value of the filter. Required for all operator types except `Advanced`.
+    - `values` - (Optional) A list of values for the filter. Required for the `Advanced` operator type.
+- `tags` - (Optional) A map of tags to assign to the event subscription.
 
 Type:
 
@@ -458,7 +501,11 @@ Default: `{}`
 
 ### <a name="input_topic_spaces"></a> [topic\_spaces](#input\_topic\_spaces)
 
-Description: (Optional) A map of topic spaces to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: (Optional) A map of topic spaces to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the topic space.
+- `description` - (Optional) A description for the topic space.
+- `topic_templates` - (Required) A list of topic templates associated with the topic space.
 
 Type:
 
@@ -474,7 +521,13 @@ Default: `{}`
 
 ### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
 
-Description: (Optional) Topic spaces configuration for MQTT and message routing.
+Description: (Optional) Topic spaces configuration for MQTT and message routing. The following properties can be specified:
+- `alternative_authentication_name_source` - (Optional) A list of alternative authentication name sources.
+- `maximum_client_sessions_per_authentication_name` - (Optional) The maximum number of client sessions per authentication name.
+- `maximum_session_expiry_in_hours` - (Optional) The maximum session expiry time in hours.
+- `route_topic_resource_id` - (Optional) The resource ID of the route topic.
+- `dynamic_routing_enrichment` - (Optional) A list of key-value pairs for dynamic routing enrichment.
+- `static_routing_enrichment` - (Optional) A list of key-value pairs for static routing enrichment.
 
 Type:
 
@@ -489,7 +542,7 @@ object({
   })
 ```
 
-Default: `null`
+Default: `{}`
 
 ## Outputs
 

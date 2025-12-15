@@ -13,7 +13,9 @@ locals {
       routeTopicResourceId                       = var.topic_spaces_configuration.route_topic_resource_id
 
       # Optional client authentication
-      clientAuthentication = var.topic_spaces_configuration.alternative_authentication_name_source
+      clientAuthentication = var.topic_spaces_configuration.alternative_authentication_name_source != null ? {
+        alternativeAuthenticationNameSources = var.topic_spaces_configuration.alternative_authentication_name_source
+      } : null
 
       # Optional message routing
       routingEnrichments = {

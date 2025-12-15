@@ -8,4 +8,5 @@ resource "azapi_resource" "topic_space" {
       topicTemplates = var.topic_templates
     }
   }
+  response_export_values = []
 }
