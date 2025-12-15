@@ -4,7 +4,6 @@ locals {
     # Network & Security properties
     inboundIpRules      = var.inbound_ip_rules
     publicNetworkAccess = var.public_network_access
-    isZoneRedundant     = var.is_zone_redundant
 
     # Topic spaces configuration
     topicSpacesConfiguration = var.topic_spaces_configuration != null ? {

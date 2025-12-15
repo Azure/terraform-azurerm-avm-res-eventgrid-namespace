@@ -58,13 +58,17 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_description"></a> [description](#output\_description)
+
+Description: The description of the client group.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the Client Group.
 
-### <a name="output_resource"></a> [resource](#output\_resource)
+### <a name="output_query"></a> [query](#output\_query)
 
-Description: The full Client Group resource output.
+Description: The query used to define client group membership.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 

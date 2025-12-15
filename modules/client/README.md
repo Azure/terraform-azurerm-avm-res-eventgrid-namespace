@@ -89,17 +89,25 @@ Default: `"Enabled"`
 
 The following outputs are exported:
 
+### <a name="output_authentication_name"></a> [authentication\_name](#output\_authentication\_name)
+
+Description: The authentication name of the client.
+
+### <a name="output_description"></a> [description](#output\_description)
+
+Description: The description of the client.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the Client.
 
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: The full Client resource output.
-
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The resource ID of the Client.
+
+### <a name="output_state"></a> [state](#output\_state)
+
+Description: The state of the client (Enabled/Disabled).
 
 ## Modules
 

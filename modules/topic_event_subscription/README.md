@@ -165,13 +165,21 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_delivery_configuration"></a> [delivery\_configuration](#output\_delivery\_configuration)
+
+Description: The delivery configuration of the event subscription.
+
+### <a name="output_event_delivery_schema"></a> [event\_delivery\_schema](#output\_event\_delivery\_schema)
+
+Description: The event delivery schema (CloudEventSchemaV1\_0).
+
+### <a name="output_filters_configuration"></a> [filters\_configuration](#output\_filters\_configuration)
+
+Description: The filters configuration for the event subscription.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the event subscription.
-
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: The full event subscription resource.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 

@@ -15,9 +15,9 @@ variable "name" {
 }
 
 # This is required for most resource modules
-variable "resource_group_name" {
+variable "parent_id" {
   type        = string
-  description = "The resource group where the EventGrid Namespace will be deployed."
+  description = "The parent resource ID where the EventGrid Namespace will be deployed."
 }
 
 variable "ca_certificates" {
@@ -174,13 +174,12 @@ variable "inbound_ip_rules" {
     action  = optional(string, "Allow") # Optional - The action to take when the rule is matched
   }))
   default     = null
-  description = "(Optional) One or more inbound_ip_rule blocks as defined below."
-}
-
-variable "is_zone_redundant" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies if the EventGrid Namespace should be zone redundant."
+  description = <<DESCRIPTION
+(Optional) One or more inbound_ip_rule blocks as defined below.
+Each object in the list supports the following attributes:
+- `ip_mask` - (Required) The IP mask (CIDR) to match on.
+- `action` - (Optional) The action to take when the rule is matched. Possible values are 'Allow' and 'Deny'. Defaults to 'Allow'.
+DESCRIPTION
 }
 
 variable "lock" {
@@ -224,19 +223,32 @@ variable "namespace_topics" {
     event_retention_days = optional(number, 1)
   }))
   default     = {}
-  description = "(Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
+  description = <<DESCRIPTION
+(Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the namespace topic.
+- `event_retention_days` - (Optional) The number of days to retain events for the topic. Defaults to 1 day.
+DESCRIPTION
 }
 
 variable "permission_bindings" {
   type = map(object({
-    name              = string
-    description       = optional(string, null)
-    client_group_name = string
-    topic_space_name  = string
-    permission        = string
+    name             = string
+    description      = optional(string, null)
+    client_group_key = string
+    topic_space_key  = string
+    permission       = string
   }))
   default     = {}
-  description = "(Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
+  description = <<DESCRIPTION
+(Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the permission binding.
+- `description` - (Optional) A description for the permission binding.
+- `client_group_key` - (Required) The map key of the client group from var.client_groups.
+- `topic_space_key` - (Required) The map key of the topic space from var.topic_spaces.
+- `permission` - (Required) The permission to grant. Possible values are 'Publisher' and 'Subscriber'.
+DESCRIPTION
 }
 
 variable "private_endpoints" {
@@ -356,7 +368,6 @@ variable "sku" {
   }
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
   default     = null

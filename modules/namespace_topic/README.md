@@ -99,9 +99,21 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_event_retention_in_days"></a> [event\_retention\_in\_days](#output\_event\_retention\_in\_days)
+
+Description: The event retention period in days.
+
+### <a name="output_input_schema"></a> [input\_schema](#output\_input\_schema)
+
+Description: The input schema of the namespace topic (CloudEventSchemaV1\_0).
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the namespace topic.
+
+### <a name="output_publisher_type"></a> [publisher\_type](#output\_publisher\_type)
+
+Description: The publisher type of the namespace topic (Custom).
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 

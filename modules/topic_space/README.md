@@ -58,17 +58,21 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_description"></a> [description](#output\_description)
+
+Description: The description of the topic space.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the Topic Space.
 
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: The full Topic Space resource output.
-
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The resource ID of the Topic Space.
+
+### <a name="output_topic_templates"></a> [topic\_templates](#output\_topic\_templates)
+
+Description: The topic templates defining the topic space.
 
 ## Modules
 

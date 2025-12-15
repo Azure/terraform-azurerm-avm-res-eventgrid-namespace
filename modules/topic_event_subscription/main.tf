@@ -1,7 +1,7 @@
 resource "azapi_resource" "event_subscription" {
   name      = var.name
   parent_id = var.namespace_topic_id
-  type      = "Microsoft.EventGrid/namespaces/topics/eventSubscriptions@2024-06-01-preview"
+  type      = "Microsoft.EventGrid/namespaces/topics/eventSubscriptions@2025-04-01-preview"
   body = {
     properties = {
       deliveryConfiguration = {

@@ -20,12 +20,6 @@ variable "inbound_ip_rules" {
   description = "Optional inbound IP rules."
 }
 
-variable "is_zone_redundant" {
-  type        = bool
-  default     = false
-  description = "Enable zone redundancy."
-}
-
 # Managed identities configuration
 variable "managed_identities" {
   type = object({

@@ -70,17 +70,29 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_client_group_name"></a> [client\_group\_name](#output\_client\_group\_name)
+
+Description: The client group name associated with this permission binding.
+
+### <a name="output_description"></a> [description](#output\_description)
+
+Description: The description of the permission binding.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the Permission Binding.
 
-### <a name="output_resource"></a> [resource](#output\_resource)
+### <a name="output_permission"></a> [permission](#output\_permission)
 
-Description: The full Permission Binding resource output.
+Description: The permission granted (Publisher/Subscriber).
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The resource ID of the Permission Binding.
+
+### <a name="output_topic_space_name"></a> [topic\_space\_name](#output\_topic\_space\_name)
+
+Description: The topic space name associated with this permission binding.
 
 ## Modules
 

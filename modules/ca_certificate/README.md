@@ -58,13 +58,17 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_description"></a> [description](#output\_description)
+
+Description: The description of the CA Certificate.
+
+### <a name="output_encoded_certificate"></a> [encoded\_certificate](#output\_encoded\_certificate)
+
+Description: The base64 encoded certificate (PEM or DER format).
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the CA Certificate.
-
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: The full CA Certificate resource output (sensitive data excluded).
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 

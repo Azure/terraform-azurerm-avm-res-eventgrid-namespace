@@ -68,16 +68,15 @@ module "eventgrid_namespace" {
   source = "../../"
 
   # Required parameters
-  location            = azurerm_resource_group.this.location
-  name                = local.eventgrid_namespace_name
-  resource_group_name = azurerm_resource_group.this.name
+  location  = azurerm_resource_group.this.location
+  name      = local.eventgrid_namespace_name
+  parent_id = azurerm_resource_group.this.id
   # Optional configurations
   capacity            = var.capacity
   diagnostic_settings = {}
   # Optional telemetry
-  enable_telemetry  = var.enable_telemetry
-  inbound_ip_rules  = var.inbound_ip_rules
-  is_zone_redundant = var.is_zone_redundant
+  enable_telemetry = var.enable_telemetry
+  inbound_ip_rules = var.inbound_ip_rules
   # Identity configuration
   managed_identities = var.managed_identities
   # Network configuration
@@ -142,14 +141,6 @@ Description: Optional inbound IP rules.
 Type: `list(object({ ip_mask = string, action = optional(string, "Allow") }))`
 
 Default: `[]`
-
-### <a name="input_is_zone_redundant"></a> [is\_zone\_redundant](#input\_is\_zone\_redundant)
-
-Description: Enable zone redundancy.
-
-Type: `bool`
-
-Default: `false`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 

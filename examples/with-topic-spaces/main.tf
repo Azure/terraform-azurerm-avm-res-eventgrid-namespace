@@ -52,7 +52,7 @@ module "eventgrid_namespace" {
 
   location                   = azurerm_resource_group.this.location
   name                       = local.eventgrid_namespace_name
-  resource_group_name        = azurerm_resource_group.this.name
+  parent_id                  = azurerm_resource_group.this.id
   enable_telemetry           = false
   topic_spaces_configuration = var.topic_spaces_configuration
 }

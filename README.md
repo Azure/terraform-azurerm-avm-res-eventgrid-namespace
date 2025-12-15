@@ -33,7 +33,6 @@ The following resources are used by this module:
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
-- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -53,9 +52,9 @@ Description: The name of the EventGrid Namespace.
 
 Type: `string`
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
-Description: The resource group where the EventGrid Namespace will be deployed.
+Description: The parent resource ID where the EventGrid Namespace will be deployed.
 
 Type: `string`
 
@@ -210,7 +209,10 @@ Default: `true`
 
 ### <a name="input_inbound_ip_rules"></a> [inbound\_ip\_rules](#input\_inbound\_ip\_rules)
 
-Description: (Optional) One or more inbound\_ip\_rule blocks as defined below.
+Description: (Optional) One or more inbound\_ip\_rule blocks as defined below.  
+Each object in the list supports the following attributes:
+- `ip_mask` - (Required) The IP mask (CIDR) to match on.
+- `action` - (Optional) The action to take when the rule is matched. Possible values are 'Allow' and 'Deny'. Defaults to 'Allow'.
 
 Type:
 
@@ -222,14 +224,6 @@ list(object({
 ```
 
 Default: `null`
-
-### <a name="input_is_zone_redundant"></a> [is\_zone\_redundant](#input\_is\_zone\_redundant)
-
-Description: (Optional) Specifies if the EventGrid Namespace should be zone redundant.
-
-Type: `bool`
-
-Default: `false`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
@@ -269,7 +263,10 @@ Default: `{}`
 
 ### <a name="input_namespace_topics"></a> [namespace\_topics](#input\_namespace\_topics)
 
-Description: (Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: (Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the namespace topic.
+- `event_retention_days` - (Optional) The number of days to retain events for the topic. Defaults to 1 day.
 
 Type:
 
@@ -284,17 +281,23 @@ Default: `{}`
 
 ### <a name="input_permission_bindings"></a> [permission\_bindings](#input\_permission\_bindings)
 
-Description: (Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: (Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the permission binding.
+- `description` - (Optional) A description for the permission binding.
+- `client_group_key` - (Required) The map key of the client group from var.client\_groups.
+- `topic_space_key` - (Required) The map key of the topic space from var.topic\_spaces.
+- `permission` - (Required) The permission to grant. Possible values are 'Publisher' and 'Subscriber'.
 
 Type:
 
 ```hcl
 map(object({
-    name              = string
-    description       = optional(string, null)
-    client_group_name = string
-    topic_space_name  = string
-    permission        = string
+    name             = string
+    description      = optional(string, null)
+    client_group_key = string
+    topic_space_key  = string
+    permission       = string
   }))
 ```
 

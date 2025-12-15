@@ -15,6 +15,4 @@ module "topic_event_subscriptions" {
   max_delivery_count               = each.value.max_delivery_count
   receive_lock_duration_in_seconds = each.value.receive_lock_duration_in_seconds
   tags                             = each.value.tags
-
-  depends_on = [module.namespace_topics]
 }
