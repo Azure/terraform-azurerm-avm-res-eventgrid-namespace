@@ -46,7 +46,7 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
+  location = "westeurope"
   name     = module.naming.resource_group.name_unique
 }
 

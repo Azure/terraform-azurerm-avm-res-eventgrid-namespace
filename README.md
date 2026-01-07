@@ -537,15 +537,15 @@ Type:
 ```hcl
 object({
     alternative_authentication_name_source          = optional(list(string), [])
-    maximum_client_sessions_per_authentication_name = optional(number)
-    maximum_session_expiry_in_hours                 = optional(number)
-    route_topic_resource_id                         = optional(string)
+    maximum_client_sessions_per_authentication_name = optional(number, null)
+    maximum_session_expiry_in_hours                 = optional(number, null)
+    route_topic_resource_id                         = optional(string, null)
     dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
     static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
   })
 ```
 
-Default: `{}`
+Default: `null`
 
 ## Outputs
 

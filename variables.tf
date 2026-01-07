@@ -469,13 +469,13 @@ DESCRIPTION
 variable "topic_spaces_configuration" {
   type = object({
     alternative_authentication_name_source          = optional(list(string), [])
-    maximum_client_sessions_per_authentication_name = optional(number)
-    maximum_session_expiry_in_hours                 = optional(number)
-    route_topic_resource_id                         = optional(string)
+    maximum_client_sessions_per_authentication_name = optional(number, null)
+    maximum_session_expiry_in_hours                 = optional(number, null)
+    route_topic_resource_id                         = optional(string, null)
     dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
     static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
   })
-  default     = {}
+  default     = null
   description = <<DESCRIPTION
 (Optional) Topic spaces configuration for MQTT and message routing. The following properties can be specified:
 - `alternative_authentication_name_source` - (Optional) A list of alternative authentication name sources.
@@ -485,5 +485,4 @@ variable "topic_spaces_configuration" {
 - `dynamic_routing_enrichment` - (Optional) A list of key-value pairs for dynamic routing enrichment.
 - `static_routing_enrichment` - (Optional) A list of key-value pairs for static routing enrichment.
 DESCRIPTION
-  nullable    = false
 }
