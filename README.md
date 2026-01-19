@@ -23,11 +23,12 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.eventgrid_namespace](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_private_endpoint.this_managed_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group.TODO](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
@@ -41,25 +42,102 @@ The following input variables are required:
 
 ### <a name="input_location"></a> [location](#input\_location)
 
-Description: Azure region where the resource should be deployed.
+Description: Azure region where the EventGrid Namespace will be deployed.
 
 Type: `string`
 
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description: The name of the this resource.
+Description: The name of the EventGrid Namespace.
 
 Type: `string`
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
-Description: The resource group where the resources will be deployed.
+Description: The parent resource ID where the EventGrid Namespace will be deployed.
 
 Type: `string`
 
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_ca_certificates"></a> [ca\_certificates](#input\_ca\_certificates)
+
+Description:   (Optional) A map of CA certificates to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the CA certificate resource.
+- `description` - (Optional) A description for the CA certificate.
+- `encoded_certificate` - (Required) The base64-encoded CA certificate data.
+
+Type:
+
+```hcl
+map(object({
+    name                = string
+    description         = optional(string, null)
+    encoded_certificate = string
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_capacity"></a> [capacity](#input\_capacity)
+
+Description: (Optional) Specifies the Capacity / Throughput Units for an Eventgrid Namespace. Valid values can be between 1 and 40.
+
+Type: `number`
+
+Default: `1`
+
+### <a name="input_client_groups"></a> [client\_groups](#input\_client\_groups)
+
+Description: (Optional) A map of client groups to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the client group.
+- `description` - (Optional) A description for the client group.
+- `query` - (Required) The query used to select clients for this client group.
+
+Type:
+
+```hcl
+map(object({
+    name        = string
+    description = optional(string, null)
+    query       = string
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_clients"></a> [clients](#input\_clients)
+
+Description: (Optional) A map of clients to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the client.
+- `authentication_name` - (Required) The name of the authentication method to use for the client.
+- `description` - (Optional) A description for the client.
+- `state` - (Optional) The state of the client. Defaults to "Enabled".
+- `client_certificate_authentication` - (Optional) Client certificate authentication settings.
+- `attributes` - (Optional) A map of additional attributes for the client.
+
+Type:
+
+```hcl
+map(object({
+    name                = string
+    authentication_name = string
+    description         = optional(string, null)
+    state               = optional(string, "Enabled")
+    client_certificate_authentication = optional(object({
+      validation_scheme   = string
+      allowed_thumbprints = optional(list(string))
+    }), null)
+    attributes = optional(map(string), {})
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
@@ -129,6 +207,24 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_inbound_ip_rules"></a> [inbound\_ip\_rules](#input\_inbound\_ip\_rules)
+
+Description: (Optional) One or more inbound\_ip\_rule blocks as defined below.  
+Each object in the list supports the following attributes:
+- `ip_mask` - (Required) The IP mask (CIDR) to match on.
+- `action` - (Optional) The action to take when the rule is matched. Possible values are 'Allow' and 'Deny'. Defaults to 'Allow'.
+
+Type:
+
+```hcl
+list(object({
+    ip_mask = string                    # Required - The IP mask (CIDR) to match on
+    action  = optional(string, "Allow") # Optional - The action to take when the rule is matched
+  }))
+```
+
+Default: `null`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description: Controls the Resource Lock configuration for this resource. The following properties can be specified:
@@ -161,6 +257,48 @@ object({
     system_assigned            = optional(bool, false)
     user_assigned_resource_ids = optional(set(string), [])
   })
+```
+
+Default: `{}`
+
+### <a name="input_namespace_topics"></a> [namespace\_topics](#input\_namespace\_topics)
+
+Description: (Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the namespace topic.
+- `event_retention_days` - (Optional) The number of days to retain events for the topic. Defaults to 1 day.
+
+Type:
+
+```hcl
+map(object({
+    name                 = string
+    event_retention_days = optional(number, 1)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_permission_bindings"></a> [permission\_bindings](#input\_permission\_bindings)
+
+Description: (Optional) A map of permission bindings to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the permission binding.
+- `description` - (Optional) A description for the permission binding.
+- `client_group_key` - (Required) The map key of the client group from var.client\_groups.
+- `topic_space_key` - (Required) The map key of the topic space from var.topic\_spaces.
+- `permission` - (Required) The permission to grant. Possible values are 'Publisher' and 'Subscriber'.
+
+Type:
+
+```hcl
+map(object({
+    name             = string
+    description      = optional(string, null)
+    client_group_key = string
+    topic_space_key  = string
+    permission       = string
+  }))
 ```
 
 Default: `{}`
@@ -198,6 +336,7 @@ map(object({
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
       kind = string
@@ -228,6 +367,14 @@ Description: Whether to manage private DNS zone groups with this module. If set 
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
+
+Description: (Optional) Whether or not public network access is allowed for this namespace. Defaults to Enabled.
+
+Type: `string`
+
+Default: `"Enabled"`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -261,6 +408,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_sku"></a> [sku](#input\_sku)
+
+Description: The SKU of the EventGrid Namespace (Standard or Premium)
+
+Type: `string`
+
+Default: `"Standard"`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: (Optional) Tags of the resource.
@@ -269,17 +424,202 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_topic_event_subscriptions"></a> [topic\_event\_subscriptions](#input\_topic\_event\_subscriptions)
+
+Description: Map of event subscriptions for namespace topics.  
+Each object in the map supports the following attributes:
+- `topic_key` - (Required) The key of the topic to subscribe to.
+- `name` - (Required) The name of the event subscription.
+- `delivery_mode` - (Required) The delivery mode for the event subscription. Possible values are `WebHook` and `Queue`.
+- `event_delivery_schema` - (Optional) The event delivery schema. Possible values are `CloudEventSchemaV1_0`, `EventGridSchema` and `CustomEventSchema`. Default is `CloudEventSchemaV1_0`.
+- `expiration_time_utc` - (Optional) The expiration time of the event subscription in UTC.
+- `event_time_to_live` - (Optional) The time to live for events in the event subscription. Default is `P1D`.
+- `max_delivery_count` - (Optional) The maximum delivery count for events in the event subscription. Default is `30`.
+- `receive_lock_duration_in_seconds` - (Optional) The receive lock duration in seconds for events in the event subscription. Default  is `60`.
+- `destination` - (Optional) The destination for the event subscription. This is required if `delivery_identity` is not specified.
+  - `endpointType` - (Required) The type of the endpoint. Possible values are `WebHook`, `EventHub`, `StorageQueue`, `ServiceBusQueue`, `ServiceBusTopic` and `HybridConnection`.
+  - `properties` - (Required) A map of properties for the endpoint.
+- `delivery_identity` - (Optional) The delivery identity for the event subscription. This is required if `destination` is not specified.
+  - `type` - (Required) The type of the identity. Possible values are `SystemAssigned`, `UserAssigned` and `SystemAssigned, UserAssigned`.
+  - `user_assigned_identity_id` - (Optional) The resource ID of the user assigned identity. This is required if `type` is `UserAssigned` or `SystemAssigned, UserAssigned`.
+- `dead_letter_destination` - (Optional) The dead letter destination for the event subscription.
+  - `storage_account_id` - (Required) The resource ID of the storage account to use for dead lettering.
+  - `blob_container_name` - (Required) The name of the blob container to use for dead lettering.
+  - `identity_type` - (Optional) The type of the identity to use for dead lettering. Possible values are `SystemAssigned` and `UserAssigned`. Default is `SystemAssigned`.
+  - `user_assigned_identity_id` - (Optional) The resource ID of the user assigned identity to use for dead lettering. This is required if `identity_type` is `UserAssigned`.
+- `filters_configuration` - (Optional) The filters configuration for the event subscription.
+  - `included_event_types` - (Optional) A list of event types to include in the event subscription.
+  - `filters` - (Optional) A list of filters to apply to the event subscription.
+    - `key` - (Required) The key of the filter.
+    - `operator_type` - (Required) The operator type of the filter. Possible values are `StringEquals`, `StringContains`, `StringBeginsWith`, `StringEndsWith`, `NumberEquals`, `NumberGreaterThan`, `NumberLessThan`, `BoolEquals` and `Advanced`.
+    - `value` - (Optional) The value of the filter. Required for all operator types except `Advanced`.
+    - `values` - (Optional) A list of values for the filter. Required for the `Advanced` operator type.
+- `tags` - (Optional) A map of tags to assign to the event subscription.
+
+Type:
+
+```hcl
+map(object({
+    topic_key                        = string
+    name                             = string
+    delivery_mode                    = string
+    event_delivery_schema            = optional(string, "CloudEventSchemaV1_0")
+    expiration_time_utc              = optional(string)
+    event_time_to_live               = optional(string, "P1D")
+    max_delivery_count               = optional(number, 30)
+    receive_lock_duration_in_seconds = optional(number, 60)
+
+    destination = optional(object({
+      endpointType = string
+      properties   = map(any)
+    }))
+
+    delivery_identity = optional(object({
+      type                      = string
+      user_assigned_identity_id = optional(string)
+    }))
+
+    dead_letter_destination = optional(object({
+      storage_account_id        = string
+      blob_container_name       = string
+      identity_type             = optional(string, "SystemAssigned")
+      user_assigned_identity_id = optional(string)
+    }))
+
+    filters_configuration = optional(object({
+      included_event_types = optional(list(string))
+      filters = optional(list(object({
+        key           = string
+        operator_type = string
+        value         = optional(any)
+        values        = optional(list(any))
+      })))
+    }))
+
+    tags = optional(map(string), {})
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_topic_spaces"></a> [topic\_spaces](#input\_topic\_spaces)
+
+Description: (Optional) A map of topic spaces to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."  
+Each object in the map supports the following attributes:
+- `name` - (Required) The name of the topic space.
+- `description` - (Optional) A description for the topic space.
+- `topic_templates` - (Required) A list of topic templates associated with the topic space.
+
+Type:
+
+```hcl
+map(object({
+    name            = string
+    description     = optional(string, null)
+    topic_templates = list(string)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
+
+Description: (Optional) Topic spaces configuration for MQTT and message routing. The following properties can be specified:
+- `alternative_authentication_name_source` - (Optional) A list of alternative authentication name sources.
+- `maximum_client_sessions_per_authentication_name` - (Optional) The maximum number of client sessions per authentication name.
+- `maximum_session_expiry_in_hours` - (Optional) The maximum session expiry time in hours.
+- `route_topic_resource_id` - (Optional) The resource ID of the route topic.
+- `dynamic_routing_enrichment` - (Optional) A list of key-value pairs for dynamic routing enrichment.
+- `static_routing_enrichment` - (Optional) A list of key-value pairs for static routing enrichment.
+
+Type:
+
+```hcl
+object({
+    alternative_authentication_name_source          = optional(list(string), [])
+    maximum_client_sessions_per_authentication_name = optional(number, null)
+    maximum_session_expiry_in_hours                 = optional(number, null)
+    route_topic_resource_id                         = optional(string, null)
+    dynamic_routing_enrichment                      = optional(list(object({ key = string, value = string })), [])
+    static_routing_enrichment                       = optional(list(object({ key = string, value = string })), [])
+  })
+```
+
+Default: `null`
+
 ## Outputs
 
 The following outputs are exported:
 
+### <a name="output_identity"></a> [identity](#output\_identity)
+
+Description: The identity of the EventGrid Namespace.
+
+### <a name="output_location"></a> [location](#output\_location)
+
+Description: The location of the EventGrid Namespace.
+
+### <a name="output_name"></a> [name](#output\_name)
+
+Description: The name of the EventGrid Namespace.
+
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
-Description:   A map of the private endpoints created.
+Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the Event Grid Namespace.
+
+### <a name="output_tags"></a> [tags](#output\_tags)
+
+Description: The tags of the EventGrid Namespace.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_ca_certificates"></a> [ca\_certificates](#module\_ca\_certificates)
+
+Source: ./modules/ca_certificate
+
+Version:
+
+### <a name="module_client_groups"></a> [client\_groups](#module\_client\_groups)
+
+Source: ./modules/client_group
+
+Version:
+
+### <a name="module_clients"></a> [clients](#module\_clients)
+
+Source: ./modules/client
+
+Version:
+
+### <a name="module_namespace_topics"></a> [namespace\_topics](#module\_namespace\_topics)
+
+Source: ./modules/namespace_topic
+
+Version:
+
+### <a name="module_permission_bindings"></a> [permission\_bindings](#module\_permission\_bindings)
+
+Source: ./modules/permission_binding
+
+Version:
+
+### <a name="module_topic_event_subscriptions"></a> [topic\_event\_subscriptions](#module\_topic\_event\_subscriptions)
+
+Source: ./modules/topic_event_subscription
+
+Version:
+
+### <a name="module_topic_spaces"></a> [topic\_spaces](#module\_topic\_spaces)
+
+Source: ./modules/topic_space
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

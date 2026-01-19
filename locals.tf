@@ -1,5 +1,15 @@
-# TODO: insert locals here.
 locals {
+  # EventGrid Properties
+  eventgrid_properties = {
+    inboundIpRules           = var.inbound_ip_rules
+    publicNetworkAccess      = var.public_network_access
+    topicSpacesConfiguration = local.topic_spaces_config
+  }
+  # SKU configuration
+  eventgrid_sku = {
+    capacity = var.capacity
+    name     = var.sku
+  }
   managed_identities = {
     system_assigned_user_assigned = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? {
       this = {
@@ -31,4 +41,18 @@ locals {
     ]
   ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
+  # Topic spaces configuration - only include if any non-null values exist
+  topic_spaces_config = var.topic_spaces_configuration != null ? {
+    maximumClientSessionsPerAuthenticationName = var.topic_spaces_configuration.maximum_client_sessions_per_authentication_name
+    maximumSessionExpiryInHours                = var.topic_spaces_configuration.maximum_session_expiry_in_hours
+    routeTopicResourceId                       = var.topic_spaces_configuration.route_topic_resource_id
+    clientAuthentication = length(var.topic_spaces_configuration.alternative_authentication_name_source) > 0 ? {
+      alternativeAuthenticationNameSources = var.topic_spaces_configuration.alternative_authentication_name_source
+    } : null
+    routingEnrichments = (length(var.topic_spaces_configuration.dynamic_routing_enrichment) > 0 ||
+      length(var.topic_spaces_configuration.static_routing_enrichment) > 0) ? {
+      dynamic = var.topic_spaces_configuration.dynamic_routing_enrichment
+      static  = var.topic_spaces_configuration.static_routing_enrichment
+    } : null
+  } : null
 }

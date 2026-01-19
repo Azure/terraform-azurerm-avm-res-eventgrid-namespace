@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.21"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -21,12 +17,11 @@ provider "azurerm" {
   features {}
 }
 
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "~> 0.1"
+  version = "0.9.0"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -39,12 +34,22 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
+  version = "0.4.2"
+}
+
+resource "random_string" "eventgrid_suffix" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
+locals {
+  eventgrid_namespace_name = "egns${random_string.eventgrid_suffix.result}"
 }
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
+  location = "westeurope"
   name     = module.naming.resource_group.name_unique
 }
 
@@ -52,13 +57,25 @@ resource "azurerm_resource_group" "this" {
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
-module "test" {
+module "eventgrid_namespace" {
   source = "../../"
 
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  location            = azurerm_resource_group.this.location
-  name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry    = var.enable_telemetry # see variables.tf
+  # Required parameters
+  location  = azurerm_resource_group.this.location
+  name      = local.eventgrid_namespace_name
+  parent_id = azurerm_resource_group.this.id
+  # Optional configurations
+  capacity            = var.capacity
+  diagnostic_settings = {}
+  # Optional telemetry
+  enable_telemetry = var.enable_telemetry
+  inbound_ip_rules = var.inbound_ip_rules
+  # Identity configuration
+  managed_identities = var.managed_identities
+  # Network configuration
+  public_network_access = var.public_network_access
+  tags = {
+    environment = "example"
+    project     = "avm-test"
+  }
 }
