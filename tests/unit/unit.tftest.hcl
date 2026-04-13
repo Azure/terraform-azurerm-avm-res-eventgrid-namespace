@@ -1,4 +1,5 @@
 mock_provider "azurerm" {}
+mock_provider "azapi" {}
 
 variables {
   enable_telemetry = false
@@ -50,5 +51,23 @@ run "name_valid_maximum_length" {
 
   variables {
     name = "abcdefghijklmnopqrstuvwxyz012345678901234567890123"
+  }
+}
+
+run "namespace_topic_event_retention_is_passed_through" {
+  command = plan
+
+  variables {
+    namespace_topics = {
+      notifications = {
+        name                 = "notifications-topic"
+        event_retention_days = 3
+      }
+    }
+  }
+
+  assert {
+    condition     = module.namespace_topics["notifications"].event_retention_in_days == 3
+    error_message = "Expected namespace topic event retention to be 3 days."
   }
 }

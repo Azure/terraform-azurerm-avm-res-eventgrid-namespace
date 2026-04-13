@@ -27,7 +27,7 @@ variable "description" {
 
 variable "event_retention_in_days" {
   type        = number
-  default     = 7
+  default     = 1
   description = "Number of days to retain events for this topic."
 }
 
