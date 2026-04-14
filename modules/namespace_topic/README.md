@@ -62,7 +62,7 @@ Description: Number of days to retain events for this topic.
 
 Type: `number`
 
-Default: `1`
+Default: `7`
 
 ### <a name="input_input_schema"></a> [input\_schema](#input\_input\_schema)
 
