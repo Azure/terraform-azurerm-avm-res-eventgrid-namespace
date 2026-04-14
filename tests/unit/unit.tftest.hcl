@@ -71,3 +71,20 @@ run "namespace_topic_event_retention_is_passed_through" {
     error_message = "Expected namespace topic event retention to be 3 days."
   }
 }
+
+run "namespace_topic_event_retention_can_be_omitted" {
+  command = plan
+
+  variables {
+    namespace_topics = {
+      notifications = {
+        name = "notifications-topic"
+      }
+    }
+  }
+
+  assert {
+    condition     = module.namespace_topics["notifications"].event_retention_in_days == 7
+    error_message = "Expected namespace topic event retention to default to 7 days when omitted."
+  }
+}

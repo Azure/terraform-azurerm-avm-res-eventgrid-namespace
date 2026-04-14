@@ -1,6 +1,8 @@
 output "event_retention_in_days" {
   description = "The event retention period in days."
-  value       = azapi_resource.namespace_topics.body.properties.eventRetentionInDays
+  value       = coalesce(
+    try(azapi_resource.namespace_topics.body.properties.eventRetentionInDays, null),
+    try(jsondecode(azapi_resource.namespace_topics.output).properties.eventRetentionInDays, null))
 }
 
 output "input_schema" {

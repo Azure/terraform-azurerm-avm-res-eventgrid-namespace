@@ -220,14 +220,14 @@ DESCRIPTION
 variable "namespace_topics" {
   type = map(object({
     name                 = string
-    event_retention_days = optional(number, 1)
+    event_retention_days = optional(number, 7)
   }))
   default     = {}
   description = <<DESCRIPTION
 (Optional) A map of namespace topics to create in the EventGrid Namespace. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 Each object in the map supports the following attributes:
 - `name` - (Required) The name of the namespace topic.
-- `event_retention_days` - (Optional) The number of days to retain events for the topic. Defaults to 1 day.
+- `event_retention_days` - (Optional) The number of days to retain events for the topic. Defaults to 7 days.
 DESCRIPTION
 }
 
