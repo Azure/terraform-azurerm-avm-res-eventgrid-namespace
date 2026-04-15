@@ -2,12 +2,13 @@ output "event_retention_in_days" {
   description = "The event retention period in days."
   value = coalesce(
     try(azapi_resource.namespace_topics.body.properties.eventRetentionInDays, null),
-  try(jsondecode(azapi_resource.namespace_topics.output).properties.eventRetentionInDays, null))
+    try(azapi_resource.namespace_topics.output.properties.eventRetentionInDays, null)
+  )
 }
 
 output "input_schema" {
   description = "The input schema of the namespace topic (CloudEventSchemaV1_0)."
-  value       = try(jsondecode(azapi_resource.namespace_topics.output).properties.inputSchema, null)
+  value       = try(azapi_resource.namespace_topics.output.properties.inputSchema, null)
 }
 
 output "name" {
@@ -17,7 +18,7 @@ output "name" {
 
 output "publisher_type" {
   description = "The publisher type of the namespace topic (Custom)."
-  value       = try(jsondecode(azapi_resource.namespace_topics.output).properties.publisherType, null)
+  value       = try(azapi_resource.namespace_topics.output.properties.publisherType, null)
 }
 
 output "resource_id" {

@@ -1,11 +1,11 @@
 output "client_group_name" {
   description = "The client group name associated with this permission binding."
-  value       = try(jsondecode(azapi_resource.permission_binding.output).properties.clientGroupName, null)
+  value       = try(azapi_resource.permission_binding.output.properties.clientGroupName, null)
 }
 
 output "description" {
   description = "The description of the permission binding."
-  value       = try(jsondecode(azapi_resource.permission_binding.output).properties.description, null)
+  value       = try(azapi_resource.permission_binding.output.properties.description, null)
 }
 
 output "name" {
@@ -15,7 +15,7 @@ output "name" {
 
 output "permission" {
   description = "The permission granted (Publisher/Subscriber)."
-  value       = try(jsondecode(azapi_resource.permission_binding.output).properties.permission, null)
+  value       = try(azapi_resource.permission_binding.output.properties.permission, null)
 }
 
 output "resource_id" {
@@ -25,5 +25,5 @@ output "resource_id" {
 
 output "topic_space_name" {
   description = "The topic space name associated with this permission binding."
-  value       = try(jsondecode(azapi_resource.permission_binding.output).properties.topicSpaceName, null)
+  value       = try(azapi_resource.permission_binding.output.properties.topicSpaceName, null)
 }

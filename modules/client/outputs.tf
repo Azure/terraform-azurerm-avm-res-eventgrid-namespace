@@ -1,11 +1,11 @@
 output "authentication_name" {
   description = "The authentication name of the client."
-  value       = try(jsondecode(azapi_resource.client.output).properties.authenticationName, null)
+  value       = try(azapi_resource.client.output.properties.authenticationName, null)
 }
 
 output "description" {
   description = "The description of the client."
-  value       = try(jsondecode(azapi_resource.client.output).properties.description, null)
+  value       = try(azapi_resource.client.output.properties.description, null)
 }
 
 output "name" {
@@ -20,5 +20,5 @@ output "resource_id" {
 
 output "state" {
   description = "The state of the client (Enabled/Disabled)."
-  value       = try(jsondecode(azapi_resource.client.output).properties.state, null)
+  value       = try(azapi_resource.client.output.properties.state, null)
 }
