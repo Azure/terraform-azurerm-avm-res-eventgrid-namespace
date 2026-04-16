@@ -1,16 +1,16 @@
 output "delivery_configuration" {
   description = "The delivery configuration of the event subscription."
-  value       = try(jsondecode(azapi_resource.event_subscription.output).properties.deliveryConfiguration, null)
+  value       = try(azapi_resource.event_subscription.output.properties.deliveryConfiguration, null)
 }
 
 output "event_delivery_schema" {
   description = "The event delivery schema (CloudEventSchemaV1_0)."
-  value       = try(jsondecode(azapi_resource.event_subscription.output).properties.eventDeliverySchema, null)
+  value       = try(azapi_resource.event_subscription.output.properties.eventDeliverySchema, null)
 }
 
 output "filters_configuration" {
   description = "The filters configuration for the event subscription."
-  value       = try(jsondecode(azapi_resource.event_subscription.output).properties.filtersConfiguration, null)
+  value       = try(azapi_resource.event_subscription.output.properties.filtersConfiguration, null)
 }
 
 output "name" {

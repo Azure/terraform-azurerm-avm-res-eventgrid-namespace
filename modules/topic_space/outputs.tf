@@ -1,6 +1,6 @@
 output "description" {
   description = "The description of the topic space."
-  value       = try(jsondecode(azapi_resource.topic_space.output).properties.description, null)
+  value       = try(azapi_resource.topic_space.output.properties.description, null)
 }
 
 output "name" {
@@ -15,5 +15,5 @@ output "resource_id" {
 
 output "topic_templates" {
   description = "The topic templates defining the topic space."
-  value       = try(jsondecode(azapi_resource.topic_space.output).properties.topicTemplates, [])
+  value       = try(azapi_resource.topic_space.output.properties.topicTemplates, [])
 }

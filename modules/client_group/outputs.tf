@@ -1,6 +1,6 @@
 output "description" {
   description = "The description of the client group."
-  value       = try(jsondecode(azapi_resource.client_group.output).properties.description, null)
+  value       = try(azapi_resource.client_group.output.properties.description, null)
 }
 
 output "name" {
@@ -10,7 +10,7 @@ output "name" {
 
 output "query" {
   description = "The query used to define client group membership."
-  value       = try(jsondecode(azapi_resource.client_group.output).properties.query, null)
+  value       = try(azapi_resource.client_group.output.properties.query, null)
 }
 
 output "resource_id" {
