@@ -22,20 +22,36 @@ run "name_too_short" {
   command = plan
 
   variables {
-    name = "abc"
+    name = "ab"
   }
 
   expect_failures = [var.name]
 }
 
-run "name_invalid_chars_hyphen" {
+run "name_invalid_chars" {
   command = plan
 
   variables {
-    name = "invalid-name"
+    name = "invalid name!"
   }
 
   expect_failures = [var.name]
+}
+
+run "name_valid_with_hyphens" {
+  command = plan
+
+  variables {
+    name = "evgn-prod-uksouth-001"
+  }
+}
+
+run "name_valid_three_chars" {
+  command = plan
+
+  variables {
+    name = "abc"
+  }
 }
 
 run "name_valid_minimum_length" {

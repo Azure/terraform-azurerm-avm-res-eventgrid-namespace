@@ -9,8 +9,12 @@ variable "name" {
   description = "The name of the EventGrid Namespace."
 
   validation {
-    condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
-    error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
+    condition = (
+      length(var.name) >= 3 &&
+      length(var.name) <= 50 &&
+      can(regex("^[a-z0-9-]+$", var.name))
+    )
+    error_message = "The name must be between 3 and 50 characters long and can contain only lowercase letters, numbers, and hyphens."
   }
 }
 
