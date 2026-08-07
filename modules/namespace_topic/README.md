@@ -66,11 +66,11 @@ Default: `7`
 
 ### <a name="input_input_schema"></a> [input\_schema](#input\_input\_schema)
 
-Description: The input schema for the topic (e.g. EventGridSchema, CloudEventSchemaV1\_0, CustomEventSchema).
+Description: The input schema for the topic.
 
 Type: `string`
 
-Default: `"EventGridSchema"`
+Default: `"CloudEventSchemaV1_0"`
 
 ### <a name="input_publisher_type"></a> [publisher\_type](#input\_publisher\_type)
 
