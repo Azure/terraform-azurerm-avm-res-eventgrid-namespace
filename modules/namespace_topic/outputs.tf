@@ -8,7 +8,10 @@ output "event_retention_in_days" {
 
 output "input_schema" {
   description = "The input schema of the namespace topic (CloudEventSchemaV1_0)."
-  value       = try(azapi_resource.namespace_topics.output.properties.inputSchema, null)
+  value = coalesce(
+    try(azapi_resource.namespace_topics.body.properties.inputSchema, null),
+    try(azapi_resource.namespace_topics.output.properties.inputSchema, null)
+  )
 }
 
 output "name" {

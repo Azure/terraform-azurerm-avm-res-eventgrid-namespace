@@ -33,8 +33,8 @@ variable "event_retention_in_days" {
 
 variable "input_schema" {
   type        = string
-  default     = "EventGridSchema"
-  description = "The input schema for the topic (e.g. EventGridSchema, CloudEventSchemaV1_0, CustomEventSchema)."
+  default     = "CloudEventSchemaV1_0"
+  description = "The input schema for the topic."
 }
 
 variable "publisher_type" {
