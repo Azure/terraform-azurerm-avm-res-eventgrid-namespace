@@ -267,6 +267,7 @@ Description: (Optional) A map of namespace topics to create in the EventGrid Nam
 Each object in the map supports the following attributes:
 - `name` - (Required) The name of the namespace topic.
 - `event_retention_days` - (Optional) The number of days to retain events for the topic. Defaults to 7 days.
+- `input_schema` - (Optional) The input schema for the namespace topic. Defaults to `CloudEventSchemaV1_0`.
 
 Type:
 
@@ -274,6 +275,7 @@ Type:
 map(object({
     name                 = string
     event_retention_days = optional(number, 7)
+    input_schema         = optional(string, "CloudEventSchemaV1_0")
   }))
 ```
 
