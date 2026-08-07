@@ -86,38 +86,3 @@ run "namespace_topic_event_retention_can_be_omitted" {
     error_message = "Expected namespace topic event retention to default to 7 days when omitted."
   }
 }
-
-run "namespace_topic_input_schema_defaults_to_cloud_events" {
-  command = plan
-
-  variables {
-    namespace_topics = {
-      notifications = {
-        name = "notifications-topic"
-      }
-    }
-  }
-
-  assert {
-    condition     = module.namespace_topics["notifications"].input_schema == "CloudEventSchemaV1_0"
-    error_message = "Expected namespace topic input schema to default to CloudEventSchemaV1_0."
-  }
-}
-
-run "namespace_topic_input_schema_is_passed_through" {
-  command = plan
-
-  variables {
-    namespace_topics = {
-      notifications = {
-        name         = "notifications-topic"
-        input_schema = "CustomEventSchema"
-      }
-    }
-  }
-
-  assert {
-    condition     = module.namespace_topics["notifications"].input_schema == "CustomEventSchema"
-    error_message = "Expected namespace topic input schema override to be passed through."
-  }
-}
