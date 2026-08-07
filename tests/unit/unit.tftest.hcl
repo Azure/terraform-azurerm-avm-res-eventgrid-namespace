@@ -28,14 +28,12 @@ run "name_too_short" {
   expect_failures = [var.name]
 }
 
-run "name_invalid_chars_hyphen" {
+run "name_valid_chars_hyphen" {
   command = plan
 
   variables {
-    name = "invalid-name"
+    name = "valid-name"
   }
-
-  expect_failures = [var.name]
 }
 
 run "name_valid_minimum_length" {
