@@ -52,6 +52,24 @@ run "name_valid_maximum_length" {
   }
 }
 
+run "private_endpoint_resource_group_id_is_passed_through" {
+  command = plan
+
+  variables {
+    private_endpoints = {
+      test = {
+        resource_group_name = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/private-endpoint-rg"
+        subnet_resource_id  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/network-rg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/test-subnet"
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_private_endpoint.this_managed_dns_zone_groups["test"].resource_group_name == "private-endpoint-rg"
+    error_message = "Expected the private endpoint resource group ID to be parsed and passed through."
+  }
+}
+
 run "namespace_topic_event_retention_is_passed_through" {
   command = plan
 
