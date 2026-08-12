@@ -40,6 +40,12 @@ locals {
       }
     ]
   ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
+  private_endpoint_resource_group_names = {
+    for key, private_endpoint in var.private_endpoints : key => coalesce(
+      private_endpoint.resource_group_name,
+      provider::azapi::parse_resource_id("Microsoft.Resources/resourceGroups", var.parent_id).name
+    )
+  }
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   # Topic spaces configuration - only include if any non-null values exist
   topic_spaces_config = var.topic_spaces_configuration != null ? {
