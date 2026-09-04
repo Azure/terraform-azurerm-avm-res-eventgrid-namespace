@@ -7,17 +7,13 @@ resource "azapi_resource" "eventgrid_namespace" {
     properties = local.eventgrid_properties
     sku        = local.eventgrid_sku
   }
-  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = [
     "properties.provisioningState",
     "properties.topicsConfiguration.hostname",
     "identity.principalId",
     "identity.tenantId"
   ]
-  tags           = var.tags
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  tags = var.tags
 
   dynamic "identity" {
     for_each = local.managed_identities.system_assigned_user_assigned
