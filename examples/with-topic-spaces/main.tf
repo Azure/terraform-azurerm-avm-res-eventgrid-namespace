@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.21"
+      version = "~> 5.2"
     }
     random = {
       source  = "hashicorp/random"
@@ -19,7 +19,7 @@ provider "azurerm" {
 
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.9.0"
+  version = "0.12.0"
 }
 
 resource "random_integer" "region_index" {
@@ -35,7 +35,7 @@ resource "random_string" "suffix" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.2"
+  version = "0.4.3"
 }
 
 resource "azurerm_resource_group" "this" {
