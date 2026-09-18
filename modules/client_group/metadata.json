@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Client Group Module",
+  "moduleDescription": "Creates a client group in an Event Grid namespace with query-defined membership.",
+  "canonicalType": "Microsoft.EventGrid/namespaces/clientGroups",
+  "telemetryIdPrefix": "46d3xtrf.res.b1c215e"
+}
