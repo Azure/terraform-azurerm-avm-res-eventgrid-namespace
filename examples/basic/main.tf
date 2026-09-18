@@ -23,7 +23,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.9.0"
 
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 # This allows us to randomize the region for the resource group.
@@ -71,7 +71,7 @@ module "eventgrid_namespace" {
   capacity            = var.capacity
   diagnostic_settings = {}
   # Optional telemetry
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   inbound_ip_rules = var.inbound_ip_rules
   # Identity configuration
   managed_identities = var.managed_identities
