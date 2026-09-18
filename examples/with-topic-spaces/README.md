@@ -28,7 +28,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.9.0"
 
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "random_integer" "region_index" {
@@ -62,7 +62,7 @@ module "eventgrid_namespace" {
   location                   = azurerm_resource_group.this.location
   name                       = local.eventgrid_namespace_name
   parent_id                  = azurerm_resource_group.this.id
-  enable_telemetry           = false
+  enable_telemetry           = var.enable_telemetry
   topic_spaces_configuration = var.topic_spaces_configuration
 }
 ```
@@ -94,6 +94,16 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
 
