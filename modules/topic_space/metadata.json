@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Topic Space Module",
+  "moduleDescription": "Creates a logical space for Event Grid topics in an Event Grid namespace.",
+  "canonicalType": "Microsoft.EventGrid/namespaces/topicSpaces",
+  "telemetryIdPrefix": "46d3xtrf.res.6abc976"
+}
