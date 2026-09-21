@@ -135,7 +135,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_inbound_ip_rules"></a> [inbound\_ip\_rules](#input\_inbound\_ip\_rules)
 
