@@ -103,7 +103,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_topic_spaces_configuration"></a> [topic\_spaces\_configuration](#input\_topic\_spaces\_configuration)
 
