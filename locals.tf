@@ -46,6 +46,16 @@ locals {
       provider::azapi::parse_resource_id("Microsoft.Resources/resourceGroups", var.parent_id).name
     )
   }
+  private_endpoint_role_assignments = { for assignment in flatten([
+    for pe_key, private_endpoint in var.private_endpoints : [
+      for role_key, role_assignment in private_endpoint.role_assignments : {
+        pe_key          = pe_key
+        role_key        = role_key
+        role_assignment = role_assignment
+      }
+    ]
+  ]) : jsonencode([assignment.pe_key, assignment.role_key]) => assignment }
+  private_endpoints                  = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this_managed_dns_zone_groups : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   # Topic spaces configuration - only include if any non-null values exist
   topic_spaces_config = var.topic_spaces_configuration != null ? {
