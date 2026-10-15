@@ -3,11 +3,13 @@ module "topic_event_subscriptions" {
   for_each = var.topic_event_subscriptions
 
   delivery_mode                    = each.value.delivery_mode
+  location                         = var.location
   name                             = each.value.name
   namespace_topic_id               = module.namespace_topics[each.value.topic_key].resource_id
   dead_letter_destination          = each.value.dead_letter_destination
   delivery_identity                = each.value.delivery_identity
   destination                      = each.value.destination
+  enable_telemetry                 = var.enable_telemetry
   event_delivery_schema            = each.value.event_delivery_schema
   event_time_to_live               = each.value.event_time_to_live
   expiration_time_utc              = each.value.expiration_time_utc
