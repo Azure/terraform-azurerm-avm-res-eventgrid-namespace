@@ -20,6 +20,13 @@ variable "inbound_ip_rules" {
   description = "Optional inbound IP rules."
 }
 
+variable "location" {
+  type        = string
+  default     = "eastus"
+  description = "The Azure region for this module's resources or telemetry deployment."
+  nullable    = false
+}
+
 # Managed identities configuration
 variable "managed_identities" {
   type = object({
