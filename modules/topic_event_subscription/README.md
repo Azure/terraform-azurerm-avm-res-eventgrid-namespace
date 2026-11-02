@@ -33,12 +33,6 @@ Description: Delivery mode: 'Push' or 'Queue'.
 
 Type: `string`
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: Name of the event subscription (3-50 characters).
@@ -153,6 +147,14 @@ object({
     })))
   })
 ```
+
+Default: `null`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
 
 Default: `null`
 

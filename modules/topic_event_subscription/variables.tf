@@ -8,12 +8,6 @@ variable "delivery_mode" {
   }
 }
 
-variable "location" {
-  type        = string
-  description = "The Azure region for this module's resources or telemetry deployment."
-  nullable    = false
-}
-
 variable "name" {
   type        = string
   description = "Name of the event subscription (3-50 characters)."
@@ -99,6 +93,17 @@ variable "filters_configuration" {
   })
   default     = null
   description = "Event filtering configuration."
+}
+
+variable "location" {
+  type        = string
+  default     = null
+  description = "The Azure region for this module's resources or telemetry deployment."
+
+  validation {
+    condition     = !var.enable_telemetry || var.location != null
+    error_message = "The location must not be null when telemetry is enabled."
+  }
 }
 
 variable "max_delivery_count" {
