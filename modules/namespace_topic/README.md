@@ -27,12 +27,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: The name of the Namespace Topic.
@@ -90,6 +84,14 @@ Description: The input schema for the topic.
 Type: `string`
 
 Default: `"CloudEventSchemaV1_0"`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_publisher_type"></a> [publisher\_type](#input\_publisher\_type)
 
